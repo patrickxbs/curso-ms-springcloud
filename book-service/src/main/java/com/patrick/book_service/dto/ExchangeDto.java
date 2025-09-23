@@ -1,4 +1,6 @@
 package com.patrick.book_service.dto;
 
-public class ExchangeDto {
+import java.math.BigDecimal;
+
+public record ExchangeDto(Long id, String from, String to, BigDecimal conversionFactor, Double convertedValue, String environment) {
 }
