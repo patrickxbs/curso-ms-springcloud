@@ -20,6 +20,7 @@ public class ExchangeController {
     private final ExchangeRepository exchangeRepository;
     private final InstanceInformationService instanceInformationService;
 
+    // http://localhost:8765/exchange/10/USD/BRL
     @GetMapping(value = "/{amount}/{from}/{to}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Exchange getExchange(
             @PathVariable BigDecimal amount,

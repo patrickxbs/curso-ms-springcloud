@@ -21,7 +21,7 @@ public class BookController {
     private final InstanceInformationService instanceInformationService;
     private final ExchangeClient exchangeClient;
 
-    // http://localhost:8100/book/1/BRL
+    // http://localhost:8765/book/14/BRL
     @GetMapping(value = "/{id}/{currency}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Book findBook(@PathVariable Long id,
