@@ -24,10 +24,15 @@ eureka:
 
 resilience4j:
   circuitbreaker:
-    instances:
+    bookCircuitBreaker:
       default:
         registerHealthIndicator: true
         slidingWindowSize: 5
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 2
+    retry:
+      instances:
+        bookRetry:
+          maxAttempts: 3
+          waitDuration: 2s

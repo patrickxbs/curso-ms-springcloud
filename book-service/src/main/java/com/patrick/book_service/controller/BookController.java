@@ -28,7 +28,8 @@ public class BookController {
     // http://localhost:8765/book/14/BRL
     @GetMapping(value = "/{id}/{currency}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @CircuitBreaker(name = "default", fallbackMethod = "fallbackBook")
+    @CircuitBreaker(name = "bookCircuitBreaker", fallbackMethod = "fallbackBook")
+    @Retry(name = "bookRetry")
     public Book findBook(@PathVariable Long id,
                          @PathVariable String currency
     ){
