@@ -27,12 +27,22 @@ resilience4j:
     bookCircuitBreaker:
       default:
         registerHealthIndicator: true
-        slidingWindowSize: 5
-        failureRateThreshold: 50
+        slidingWindowSize: 5  # analisa as ultimas 5 requisições.
+        failureRateThreshold: 50  # se 50% delas falharem, ele abre o circuito
         waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 2
+        permittedNumberOfCallsInHalfOpenState: 2  # quando entra em meio-aberto, permite 2 chamadas de teste
     retry:
       instances:
         bookRetry:
-          maxAttempts: 3
-          waitDuration: 2s
+          maxAttempts: 3  # vai tentar 3 vezes no total (a primeira tentativa + 2 novas)
+          waitDuration: 2s  # espera 2 segundos entre as tentativas
+    ratelimiter:
+      instances:
+        bookRateLimiter:  # limita, 5 chamadas a cada 10 segundos
+          limitForPeriod: 5
+          limitRefreshPeriod: 10s
+    resilience4j.bulkhead:  # Impede que um serviço sobrecarregado afete outros
+      instances:
+        bookBulkhead:
+          maxConcurrentCalls: 5
+          maxWaitDuration: 60s

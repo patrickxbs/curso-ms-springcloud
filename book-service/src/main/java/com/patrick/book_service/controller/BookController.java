@@ -5,7 +5,9 @@ import com.patrick.book_service.dto.ExchangeDto;
 import com.patrick.book_service.environment.InstanceInformationService;
 import com.patrick.book_service.model.Book;
 import com.patrick.book_service.repository.BookRepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -30,6 +32,8 @@ public class BookController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @CircuitBreaker(name = "bookCircuitBreaker", fallbackMethod = "fallbackBook")
     @Retry(name = "bookRetry")
+    @RateLimiter(name = "bookRateLimiter")
+    @Bulkhead(name = "bookBulkhead", type = Bulkhead.Type.THREADPOOL)
     public Book findBook(@PathVariable Long id,
                          @PathVariable String currency
     ){
