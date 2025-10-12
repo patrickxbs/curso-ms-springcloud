@@ -8,7 +8,20 @@ spring:
     gateway:
       server:
         webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
+          routes:
+            - id: book-service
+              uri: lb://book-service
+              predicates:
+                - Path=/book/**
+            - id: exchange-service
+              uri: lb://exchange-service
+              predicates:
+                - Path=/exchange/**
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: book-service
+        url: /book/v3/api-docs
+      - name: exchange-service
+        url: /exchange/v3/api-docs

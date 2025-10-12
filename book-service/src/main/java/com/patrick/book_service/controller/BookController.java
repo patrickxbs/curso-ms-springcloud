@@ -9,6 +9,8 @@ import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
+@Tag(name = "Book Controller")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/book")
@@ -28,12 +31,13 @@ public class BookController {
     private final ExchangeClient exchangeClient;
 
     // http://localhost:8765/book/14/BRL
+    @Operation(summary = "Find a specific book by your id")
     @GetMapping(value = "/{id}/{currency}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @CircuitBreaker(name = "bookCircuitBreaker", fallbackMethod = "fallbackBook")
     @Retry(name = "bookRetry")
     @RateLimiter(name = "bookRateLimiter")
-    @Bulkhead(name = "bookBulkhead", type = Bulkhead.Type.THREADPOOL)
+    @Bulkhead(name = "bookBulkhead")
     public Book findBook(@PathVariable Long id,
                          @PathVariable String currency
     ){

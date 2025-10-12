@@ -24,13 +24,13 @@ eureka:
 
 resilience4j:
   circuitbreaker:
-    bookCircuitBreaker:
-      default:
-        registerHealthIndicator: true
-        slidingWindowSize: 5  # analisa as ultimas 5 requisições.
-        failureRateThreshold: 50  # se 50% delas falharem, ele abre o circuito
-        waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 2  # quando entra em meio-aberto, permite 2 chamadas de teste
+    instances:
+      bookCircuitBreaker:
+          registerHealthIndicator: true
+          slidingWindowSize: 5  # analisa as ultimas 5 requisições.
+          failureRateThreshold: 50  # se 50% delas falharem, ele abre o circuito
+          waitDurationInOpenState: 5s
+          permittedNumberOfCallsInHalfOpenState: 2  # quando entra em meio-aberto, permite 2 chamadas de teste
     retry:
       instances:
         bookRetry:
@@ -46,3 +46,10 @@ resilience4j:
         bookBulkhead:
           maxConcurrentCalls: 5
           maxWaitDuration: 60s
+
+springdoc:
+  api-docs:
+    path: /book/v3/api-docs
+  swagger-ui:
+    url: /book/v3/api-docs
+  override-server-url: true
