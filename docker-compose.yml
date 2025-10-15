@@ -1,0 +1,112 @@
+services:
+
+  zipkin-server:
+    image: openzipkin/zipkin:3.5.1
+    ports:
+      - 9411:9411
+    restart: always
+    networks:
+      - patrick-network
+
+  discovery-service:
+    image: patrickbxs/discovery-service:0.0.1-SNAPSHOT
+    ports:
+      - 8761:8761
+    depends_on:
+      - zipkin-server
+    networks:
+      - patrick-network
+
+  api-gateway:
+    image: patrickbxs/api-gateway:0.0.1-SNAPSHOT
+    ports:
+      - 8765:8765
+    restart: always
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    depends_on:
+      - zipkin-server
+      - discovery-service
+    environment:
+      SPRING_ZIPKIN_BASEURL: http://zipkin-server:9411
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka/
+    networks:
+      - patrick-network
+
+  book-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: book_service
+    ports:
+      - 3310:3306
+    networks:
+      - patrick-network
+
+  exchange-db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: 1234
+      MYSQL_DATABASE: exchange_service
+    ports:
+      - 3308:3306
+    networks:
+      - patrick-network
+
+  exchange-service:
+    image: patrickbxs/exchange-service:0.0.1-SNAPSHOT
+    restart: always
+    build:
+      context: ./exchange-service
+      dockerfile: Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING_ZIPKIN_BASEURL: http://zipkin-server:9411
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://exchange-db:3306/exchange_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING_DATASOURCE_USERNAME: docker
+      SPRING_DATASOURCE_PASSWORD: 1234
+    ports:
+      - 8000:8000
+    depends_on:
+      - zipkin-server
+      - discovery-service
+      - exchange-db
+    networks:
+      - patrick-network
+
+  book-service:
+    image: patrickbxs/book-service:0.0.1-SNAPSHOT
+    restart: always
+    build:
+      context: ./book-service
+      dockerfile: Dockerfile
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING_ZIPKIN_BASEURL: http://zipkin-server:9411
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://book-db:3306/book_service?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING_DATASOURCE_USERNAME: docker
+      SPRING_DATASOURCE_PASSWORD: 1234
+    ports:
+      - 8100:8100
+    depends_on:
+      - zipkin-server
+      - discovery-service
+      - exchange-db
+    networks:
+      - patrick-network
+
+networks:
+  patrick-network:
+    name: patrick-network
+    driver: bridge

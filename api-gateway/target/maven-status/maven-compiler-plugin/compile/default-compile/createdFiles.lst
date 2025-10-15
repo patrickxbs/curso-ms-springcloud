@@ -1,0 +1,4 @@
+com\patrick\api_gateway\config\OpenApiConfig.class
+com\patrick\api_gateway\config\CorsConfig.class
+com\patrick\api_gateway\ApiGatewayApplication.class
+com\patrick\api_gateway\filter\LoggingFilter.class
